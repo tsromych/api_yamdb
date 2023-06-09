@@ -1,10 +1,8 @@
 from django.contrib.auth import get_user_model
 from django.core.validators import MaxValueValidator, MinValueValidator
-from django.db.models import (CASCADE, SET_NULL, Avg, CharField, DateTimeField,
+from django.db.models import (CASCADE, Avg, CharField, DateTimeField,
                               ForeignKey, IntegerField, Model,
-                              PositiveIntegerField, TextField, UniqueConstraint)
-
-from django.utils.timezone import now
+                              UniqueConstraint)
 
 User = get_user_model()
 
@@ -71,9 +69,9 @@ class Review(Model):
         }
     )
     pub_date = DateTimeField(
-        'дата публикации',
         auto_now_add=True,
-        db_index=True
+        db_index=True,
+        verbose_name='дата публикации'
     )
 
     class Meta:
@@ -105,9 +103,8 @@ class Comment(Model):
         verbose_name='автор'
     )
     pub_date = DateTimeField(
-        'дата публикации',
         auto_now_add=True,
-        db_index=True
+        verbose_name='дата публикации'
     )
 
     class Meta:

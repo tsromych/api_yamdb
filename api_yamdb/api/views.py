@@ -3,7 +3,8 @@ from django.shortcuts import get_object_or_404
 from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.viewsets import ModelViewSet
-from reviews.models import Review, Title, Comment
+
+from reviews.models import Comment, Review, Title
 
 from .serializers import CommentSerializer, ReviewSerializer, TitleSerializer
 
@@ -35,6 +36,7 @@ class CommentViewSet(ModelViewSet):
         return get_object_or_404(Review, pk=self.kwargs.get('post_id'))
 
     def get_queryset(self):
+        print(self.get_review().comments.all())
         return self.get_review().comments.all()
 
     def perform_create(self, serializer):

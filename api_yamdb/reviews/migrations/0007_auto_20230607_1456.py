@@ -21,7 +21,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='comment',
             name='pub_date',
-            field=models.DateTimeField(auto_now_add=True, default=1, verbose_name='дата публикации'),
+            field=models.DateTimeField(auto_now_add=True, verbose_name='дата публикации'),
             preserve_default=False,
         ),
         migrations.AlterField(

@@ -1,5 +1,6 @@
 from rest_framework.serializers import (ModelSerializer, SerializerMethodField,
                                         SlugRelatedField)
+
 from reviews.models import Comment, Review, Title
 
 
@@ -11,8 +12,6 @@ class TitleSerializer(ModelSerializer):
 
     class Meta:
         model = Title
-        # fields = ['id', 'name', 'year', 'rating', 'description',
-        #           'genre', 'category']
         fields = ['rating']
 
 
