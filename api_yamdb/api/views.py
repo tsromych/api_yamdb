@@ -33,11 +33,11 @@ class CommentViewSet(ModelViewSet):
     # permission_classes = [OwnerOrReadOnly, IsAuthenticatedOrReadOnly]
 
     def get_review(self):
-        return get_object_or_404(Review, pk=self.kwargs.get('post_id'))
+        return get_object_or_404(Review, id=self.kwargs.get('review_id'))
 
     def get_queryset(self):
-        print(self.get_review().comments.all())
+
         return self.get_review().comments.all()
 
     def perform_create(self, serializer):
-        serializer.save(author=self.request.user, post=self.get_review())
+        serializer.save(author=self.request.user, review=self.get_review())

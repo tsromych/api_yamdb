@@ -1,14 +1,12 @@
 from django.contrib.auth import get_user_model
 from django.core.validators import MaxValueValidator, MinValueValidator
-from django.db.models import (CASCADE, Avg, CharField, DateTimeField,
-                              ForeignKey, IntegerField, Model,
-                              UniqueConstraint)
+from django.db import models
 
 User = get_user_model()
 
 
-class Genre(Model):
-    name = CharField(max_length=255)
+class Genre(models.Model):
+    name = models.CharField(max_length=255)
 
     class Meta:
         verbose_name = 'Жанр'
@@ -18,12 +16,29 @@ class Genre(Model):
         return self.name
 
 
-class Title(Model):
-    name = CharField(max_length=255)
-
-    def average_rating(self):
-        return (self.reviews.aggregate(avg_rating=Avg('rating'))
-                .get('avg_rating'))
+class Title(models.Model):
+    """Модель произведений."""
+    name = models.CharField(
+        max_length=256,
+        db_index=True,
+    )
+    year = models.IntegerField(
+        db_index=True,
+    )
+    description = models.TextField(
+        blank=True,
+    )
+    # genre = models.ManyToManyField(
+    #     "Genre",
+    #     through="TitleGenre",
+    # )
+    category = models.ForeignKey(
+        "Category",
+        related_name="titles",
+        blank=True,
+        null=True,
+        on_delete=models.SET_NULL,
+    )
 
     class Meta:
         verbose_name = 'Произведение'
@@ -33,8 +48,8 @@ class Title(Model):
         return self.name
 
 
-class Category(Model):
-    name = CharField(max_length=255)
+class Category(models.Model):
+    name = models.CharField(max_length=255)
 
     class Meta:
         verbose_name = 'Категория'
@@ -44,21 +59,21 @@ class Category(Model):
         return self.name
 
 
-class Review(Model):
-    title = ForeignKey(
+class Review(models.Model):
+    title = models.ForeignKey(
         Title,
-        on_delete=CASCADE,
+        on_delete=models.CASCADE,
         related_name='reviews',
         verbose_name='произведение'
     )
-    text = CharField(max_length=200)
-    author = ForeignKey(
+    text = models.CharField(max_length=200)
+    author = models.ForeignKey(
         User,
-        on_delete=CASCADE,
+        on_delete=models.CASCADE,
         related_name='reviews',
         verbose_name='автор'
     )
-    rating = IntegerField(
+    score = models.PositiveSmallIntegerField(
         'оценка',
         validators=(
             MinValueValidator(1),
@@ -68,7 +83,7 @@ class Review(Model):
             'validators': 'Пожалуйста, поставьте оценку от 1 до 10'
         }
     )
-    pub_date = DateTimeField(
+    pub_date = models.DateTimeField(
         auto_now_add=True,
         db_index=True,
         verbose_name='дата публикации'
@@ -78,7 +93,7 @@ class Review(Model):
         verbose_name = 'Отзыв'
         verbose_name_plural = 'Отзывы'
         constraints = [
-            UniqueConstraint(
+            models.UniqueConstraint(
                 fields=('title', 'author', ),
                 name='unique review'
             )]
@@ -88,21 +103,21 @@ class Review(Model):
         return self.text
 
 
-class Comment(Model):
-    review = ForeignKey(
+class Comment(models.Model):
+    review = models.ForeignKey(
         Review,
-        on_delete=CASCADE,
+        on_delete=models.CASCADE,
         related_name='comments',
         verbose_name='отзыв'
     )
-    text = CharField('текст комментария', max_length=200)
-    author = ForeignKey(
+    text = models.CharField('текст комментария', max_length=200)
+    author = models.ForeignKey(
         User,
-        on_delete=CASCADE,
+        on_delete=models.CASCADE,
         related_name='comments',
         verbose_name='автор'
     )
-    pub_date = DateTimeField(
+    pub_date = models.DateTimeField(
         auto_now_add=True,
         verbose_name='дата публикации'
     )
@@ -113,3 +128,18 @@ class Comment(Model):
 
     def __str__(self):
         return self.text
+
+
+class TitleGenre(models.Model):
+    """Промежуточная таблица для связи произведений и жанров."""
+    title = models.ForeignKey(
+        Title,
+        on_delete=models.CASCADE,
+    )
+    genre = models.ForeignKey(
+        Genre,
+        on_delete=models.CASCADE,
+    )
+
+    def __str__(self):
+        return f'{self.title}, {self.genre}'
