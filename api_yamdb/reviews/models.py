@@ -68,11 +68,11 @@ class Genre(models.Model):
 
 class TitleGenre(models.Model):
     """Промежуточная таблица для связи произведений и жанров."""
-    title = models.ForeignKey(
+    title_id = models.ForeignKey(
         Title,
         on_delete=models.CASCADE,
     )
-    genre = models.ForeignKey(
+    genre_id = models.ForeignKey(
         Genre,
         on_delete=models.CASCADE,
     )

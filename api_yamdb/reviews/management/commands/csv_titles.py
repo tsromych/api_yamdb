@@ -12,11 +12,15 @@ class Command(BaseCommand):
         with open(
             os.path.join(
                 settings.BASE_DIR,
-                'static', 'data', 'titles.csv'
+                "static", "data", "titles.csv"
             ),
-            'r', encoding='utf-8'
-        ) as f:
-            csv_reader = csv.reader(f, delimiter=',')
-            for row in csv_reader:
-                Title.objects.create(id=int(row[0]), name=row[1], year=row[2],
-                                     category_id=int(row[3]))
+            "r", encoding="utf-8"
+        ) as file:
+            reader = csv.reader(file, delimiter=",")
+            for row in reader:
+                Title.objects.create(
+                    id=int(row[0]),
+                    name=row[1],
+                    year=int(row[2]),
+                    category=int(row[3]),
+                )
