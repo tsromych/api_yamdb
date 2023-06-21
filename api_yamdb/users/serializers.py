@@ -56,11 +56,13 @@ class ConformationCodeSerializer(serializers.ModelSerializer):
 class UserCreateSerializer(serializers.ModelSerializer):
     username = serializers.CharField(
         validators=[UniqueValidator(
-            queryset=User.objects.all())]
+            queryset=User.objects.all())],
+        max_length=150
     )
     email = serializers.EmailField(
         validators=[UniqueValidator(
-            queryset=User.objects.all())]
+            queryset=User.objects.all())],
+        max_length=254
     )
 
     class Meta:
@@ -69,6 +71,21 @@ class UserCreateSerializer(serializers.ModelSerializer):
             'username',
             'email',
         )
+
+    def validate(self, data):
+        if User.objects.filter(
+            username=data['username']
+        ) and not User.objects.filter(email=data['email']):
+            raise serializers.ValidationError(
+                'Пользователь с таким username уже существует'
+            )
+        if User.objects.filter(
+            email=data['email']
+        ) and not User.objects.filter(username=data['username']):
+            raise serializers.ValidationError(
+                'Пользователь с таким email уже существует'
+            )
+        return data
 
     def validate_username(self, name):
         if name == 'me':
