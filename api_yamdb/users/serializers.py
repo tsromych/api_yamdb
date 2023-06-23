@@ -53,35 +53,27 @@ class ConformationCodeSerializer(serializers.ModelSerializer):
         )
 
 
-class UserCreateSerializer(serializers.ModelSerializer):
+class UserCreateSerializer(serializers.Serializer):
     username = serializers.CharField(
-        validators=[UniqueValidator(
-            queryset=User.objects.all())],
+        required=True,
         max_length=150
     )
     email = serializers.EmailField(
-        validators=[UniqueValidator(
-            queryset=User.objects.all())],
-        max_length=254
+        required=True,
+        max_length=254,
     )
 
-    class Meta:
-        model = User
-        fields = (
-            'username',
-            'email',
-        )
+    def create(self, validated_data):
+        return User.objects.get_or_create(**validated_data)
 
     def validate(self, data):
-        if User.objects.filter(
-            username=data['username']
-        ) and not User.objects.filter(email=data['email']):
+        if (User.objects.filter(username=data['username'])
+                and not User.objects.filter(email=data['email'])):
             raise serializers.ValidationError(
                 'Пользователь с таким username уже существует'
             )
-        if User.objects.filter(
-            email=data['email']
-        ) and not User.objects.filter(username=data['username']):
+        if (User.objects.filter(email=data['email'])
+                and not User.objects.filter(username=data['username'])):
             raise serializers.ValidationError(
                 'Пользователь с таким email уже существует'
             )
@@ -92,7 +84,7 @@ class UserCreateSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError(
                 'Введенное имя недопустимо!'
             )
-        if not re.match(r'^[\w.@+-]+\Z', name):
+        if not re.match(r'[\w.@+-]+\Z', name):
             raise serializers.ValidationError(
                 'В username использованы недопустимые символы!'
             )

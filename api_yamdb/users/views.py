@@ -11,7 +11,7 @@ from rest_framework_simplejwt.tokens import AccessToken
 from rest_framework.pagination import PageNumberPagination
 from smtplib import SMTPException
 
-from api.permissions import IsAdminPermission, IsAdmin
+from api.permissions import IsAdmin
 from users.models import CustomUser
 from users.serializers import (UserSerializer, UserCreateSerializer,
                                ConformationCodeSerializer, RoleUserSerializer)
