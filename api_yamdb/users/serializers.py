@@ -5,7 +5,7 @@ from rest_framework.validators import UniqueValidator
 
 from users.models import CustomUser
 
-User = CustomUser  # get_user_model()
+User = CustomUser
 
 
 class UserSerializer(serializers.ModelSerializer):
