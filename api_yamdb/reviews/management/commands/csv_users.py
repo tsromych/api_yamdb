@@ -4,7 +4,7 @@ import os
 from django.conf import settings
 from django.core.management.base import BaseCommand
 
-from users.models import User
+from users.models import CustomUser
 
 
 class Command(BaseCommand):
@@ -17,8 +17,9 @@ class Command(BaseCommand):
             "r", encoding="utf-8"
         ) as file:
             reader = csv.reader(file, delimiter=",")
+            next(reader, None)
             for row in reader:
-                User.objects.create(
+                CustomUser.objects.create(
                     id=int(row[0]),
                     username=row[1],
                     email=row[2],

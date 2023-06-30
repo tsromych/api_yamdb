@@ -1,26 +1,27 @@
+import uuid
+
 from django.conf import settings
-from django.shortcuts import get_object_or_404
+from django.contrib.auth import get_user_model
 from django.core.mail import send_mail
-from rest_framework import views, viewsets, status
-from rest_framework.exceptions import ValidationError
+from django.shortcuts import get_object_or_404
+from rest_framework import status, views, viewsets
 from rest_framework.decorators import action
+from rest_framework.exceptions import ValidationError
 from rest_framework.filters import SearchFilter
+from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import AccessToken
-from rest_framework.pagination import PageNumberPagination
-from smtplib import SMTPException
 
-from api.permissions import IsAdminPermission, IsAdmin
-from users.models import CustomUser
-from users.serializers import (UserSerializer, UserCreateSerializer,
-                               ConformationCodeSerializer, RoleUserSerializer)
+from api.permissions import IsAdmin
+from users.serializers import (ConformationCodeSerializer, RoleUserSerializer,
+                               UserCreateSerializer, UserSerializer)
 
-User = CustomUser  # get_user_model()
+User = get_user_model()
 
 
 class UserViewSet(viewsets.ModelViewSet):
-    '''Вьюсет для отображения всех пользователей сайта.'''
+    """Вьюсет для отображения всех пользователей сайта."""
     queryset = User.objects.all()
     serializer_class = UserSerializer
     permission_classes = (IsAdmin,)
@@ -52,29 +53,39 @@ class UserViewSet(viewsets.ModelViewSet):
             raise error
 
 
+def get_and_send_confirmation_code(user):
+    user.update(confirmation_code=str(uuid.uuid4()))
+    send_mail(
+        'Код подтверждения',
+        (f'Код подтверждения для пользователя "{user.username}":'
+         f' {user.confirmation_code}'),
+        settings.EMAIL_HOST_USER,
+        [user.email]
+    )
+
+
 class UserSignUpView(views.APIView):
     permission_classes = (AllowAny,)
 
     def post(self, request):
-        user = User.objects.filter(**request.data)
-        if user.exists():
-            return Response(request.data, status=status.HTTP_200_OK)
-        serializer = UserCreateSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        username = serializer.validated_data['username']
-        email = serializer.validated_data['email']
-        serializer.save()
-        user = get_object_or_404(User, username=username)
+        username = request.data.get('username',)
+        email = request.data.get('email',)
         try:
-            send_mail(
-                f'Код подтверждения пользователя {username}',
-                f'Ваш код: {user.confirmation_code}',
-                settings.EMAIL_HOST_USER,
-                [f'{email}'],
-                fail_silently=False
-            )
-        except SMTPException as error:
-            raise error
+            user = User.objects.get(username=username, email=email)
+            user.confirmation_code = uuid.uuid4()
+            user.save(update_fields=['confirmation_code'])
+        except User.DoesNotExist:
+            serializer = UserCreateSerializer(data=request.data)
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+            user = get_object_or_404(User, username=username, email=email)
+        send_mail(
+            f'Код подтверждения пользователя {username}',
+            f'Ваш код: {user.confirmation_code}',
+            settings.EMAIL_HOST_USER,
+            [f'{email}'],
+            fail_silently=False
+        )
         return Response(
             {'email': email, 'username': username},
             status=status.HTTP_200_OK

@@ -17,6 +17,7 @@ class Command(BaseCommand):
             "r", encoding="utf-8"
         ) as file:
             reader = csv.reader(file, delimiter=",")
+            next(reader, None)
             for row in reader:
                 Category.objects.create(
                     id=int(row[0]),
