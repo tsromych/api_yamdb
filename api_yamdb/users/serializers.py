@@ -1,8 +1,9 @@
-import re
-
 from rest_framework import serializers
 
 from users.models import CustomUser
+
+from api.service_functions import check_username
+
 
 User = CustomUser  # get_user_model()
 
@@ -79,12 +80,6 @@ class UserCreateSerializer(serializers.Serializer):
         return data
 
     def validate_username(self, name):
-        if name == 'me':
-            raise serializers.ValidationError(
-                'Введенное имя недопустимо!'
-            )
-        if not re.match(r'[\w.@+-]+\Z', name):
-            raise serializers.ValidationError(
-                'В username использованы недопустимые символы!'
-            )
-        return name
+        checking_result = check_username(name)
+        if checking_result is True:
+            return name
