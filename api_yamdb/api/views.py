@@ -4,6 +4,7 @@ from rest_framework import viewsets
 from rest_framework.filters import SearchFilter
 from rest_framework.pagination import LimitOffsetPagination
 
+from reviews.models import Category, Comment, Genre, Review, Title
 from .filters import TitleFilters
 from .mixins import TitlesViewSet
 from .permissions import (IsAdminPermission,
@@ -11,7 +12,6 @@ from .permissions import (IsAdminPermission,
 from .serializers import (CategorySerializer, CommentSerializer,
                           GenreSerializer, GetTitleSerializer,
                           PostTitleSerializer, ReviewSerializer)
-from reviews.models import Category, Comment, Genre, Review, Title
 
 
 class CategoryViewSet(TitlesViewSet):
