@@ -4,13 +4,13 @@ from rest_framework import viewsets
 from rest_framework.filters import SearchFilter
 from rest_framework.pagination import LimitOffsetPagination
 
-from api.filters import TitleFilters
-from api.mixins import TitlesViewSet
-from api.permissions import (IsAdminPermission,
-                             IsAuthorOrModeratorOrAdminPermission)
-from api.serializers import (CategorySerializer, CommentSerializer,
-                             GenreSerializer, GetTitleSerializer,
-                             PostTitleSerializer, ReviewSerializer)
+from .filters import TitleFilters
+from .mixins import TitlesViewSet
+from .permissions import (IsAdminPermission,
+                          IsAuthorOrModeratorOrAdminPermission)
+from .serializers import (CategorySerializer, CommentSerializer,
+                          GenreSerializer, GetTitleSerializer,
+                          PostTitleSerializer, ReviewSerializer)
 from reviews.models import Category, Comment, Genre, Review, Title
 
 
@@ -56,13 +56,14 @@ class ReviewViewSet(viewsets.ModelViewSet):
     permission_classes = (IsAuthorOrModeratorOrAdminPermission,)
     pagination_class = LimitOffsetPagination
 
+    def get_title(self):
+        return get_object_or_404(Title, id=self.kwargs.get('title_id'))
+
     def get_queryset(self):
-        title = get_object_or_404(Title, id=self.kwargs.get('title_id'))
-        return title.reviews.all()
+        return self.get_title().reviews.all()
 
     def perform_create(self, serializer):
-        title = get_object_or_404(Title, id=self.kwargs.get('title_id'))
-        serializer.save(author=self.request.user, title=title)
+        serializer.save(author=self.request.user, title=self.get_title())
 
 
 class CommentViewSet(viewsets.ModelViewSet):
@@ -72,7 +73,11 @@ class CommentViewSet(viewsets.ModelViewSet):
     pagination_class = LimitOffsetPagination
 
     def get_review(self):
-        return get_object_or_404(Review, id=self.kwargs.get('review_id'))
+        return get_object_or_404(
+            Review,
+            id=self.kwargs.get('review_id'),
+            title=self.kwargs['title_id']
+        )
 
     def get_queryset(self):
         return self.get_review().comments.all()

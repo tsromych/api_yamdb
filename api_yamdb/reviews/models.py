@@ -2,22 +2,22 @@ from django.contrib.auth import get_user_model
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 
-from reviews.validators import validator_year
+from .validators import validator_year
 
 User = get_user_model()
 
-LENGTH_256 = 256
-LENGTH_50 = 50
-LENGTH_200 = 200
+CHAR_COUNT_256 = 256
+CHAR_COUNT_50 = 50
+CHAR_COUNT_200 = 200
 
 
 class AbstractClass(models.Model):
     name = models.CharField(
-        max_length=LENGTH_256,
+        max_length=CHAR_COUNT_256,
         verbose_name='Название',
     )
     slug = models.SlugField(
-        max_length=LENGTH_50,
+        max_length=CHAR_COUNT_50,
         unique=True,
         verbose_name='Слаг',
     )
@@ -49,7 +49,7 @@ class Genre(AbstractClass):
 class Title(models.Model):
     """Модель произведений."""
     name = models.CharField(
-        max_length=LENGTH_256,
+        max_length=CHAR_COUNT_256,
         db_index=True,
         verbose_name='Название',
     )
@@ -106,17 +106,19 @@ class Review(models.Model):
         Title,
         on_delete=models.CASCADE,
         related_name='reviews',
-        verbose_name='произведение',
+        verbose_name='Произведение',
     )
-    text = models.CharField(max_length=200)
+    text = models.CharField(
+        max_length=CHAR_COUNT_200
+    )
     author = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
         related_name='reviews',
-        verbose_name='автор',
+        verbose_name='Автор',
     )
     score = models.PositiveSmallIntegerField(
-        'оценка',
+        verbose_name='Оценка',
         validators=(
             MinValueValidator(1),
             MaxValueValidator(10)
@@ -128,7 +130,7 @@ class Review(models.Model):
     pub_date = models.DateTimeField(
         auto_now_add=True,
         db_index=True,
-        verbose_name='дата публикации',
+        verbose_name='Дата публикации',
     )
 
     class Meta:
@@ -150,21 +152,21 @@ class Comment(models.Model):
         Review,
         on_delete=models.CASCADE,
         related_name='comments',
-        verbose_name='отзыв',
+        verbose_name='Отзыв',
     )
     text = models.CharField(
-        'текст комментария',
-        max_length=200,
+        verbose_name='Текст комментария',
+        max_length=CHAR_COUNT_200,
     )
     author = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
         related_name='comments',
-        verbose_name='автор',
+        verbose_name='Автор',
     )
     pub_date = models.DateTimeField(
         auto_now_add=True,
-        verbose_name='дата публикации',
+        verbose_name='Дата публикации',
     )
 
     class Meta:
