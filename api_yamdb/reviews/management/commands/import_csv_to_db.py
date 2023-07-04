@@ -7,7 +7,7 @@ from django.core.management.base import BaseCommand
 from reviews.models import Category, Comment, Genre, Review, Title, TitleGenre
 from users.models import CustomUser
 
-parent_dir = os.path.join(settings.BASE_DIR, 'static', 'data/')
+parent_dir = os.path.join(settings.BASE_DIR, 'static/data/')
 file_name = {
     'users': 'users.csv',
     'category': 'category.csv',
@@ -23,10 +23,13 @@ class Command(BaseCommand):
     """Загрузка данных из CSV файлов в базу данных."""
     def handle(self, *args, **options):
         def print_import_status(file_name):
-            print(self.style.SUCCESS('Импорт данных из файла '
-                                     f'{file_name} завершен!'))
+            self.stdout.write(self.style.SUCCESS(
+                f'Импорт данных из файла {file_name} успешно завершен!')
+            )
+        self.stdout.write(self.style.SUCCESS(
+            'Начинаем загрузку данных из CSV файлов...')
+        )
 
-        print(self.style.SUCCESS('Начинем загрузку данных из CSV файлов...'))
         with open(
             parent_dir + file_name['users'], mode='r', encoding='utf-8'
         ) as file:
@@ -121,4 +124,4 @@ class Command(BaseCommand):
                 )
             print_import_status(file_name['comments'])
 
-        print(self.style.SUCCESS('Загрузка данных завершена'))
+        self.stdout.write(self.style.SUCCESS('Загрузка данных завершена.'))
