@@ -25,7 +25,7 @@ class Command(BaseCommand):
         def print_import_status(file_name):
             print(self.style.SUCCESS('Импорт данных из файла '
                                      f'{file_name} завершен!'))
-            
+
         print(self.style.SUCCESS('Начинем загрузку данных из CSV файлов...'))
         with open(
             parent_dir + file_name['users'], mode='r', encoding='utf-8'
@@ -120,5 +120,5 @@ class Command(BaseCommand):
                     review_id=int(row['review_id']),
                 )
             print_import_status(file_name['comments'])
-            
+
         print(self.style.SUCCESS('Загрузка данных завершена'))
