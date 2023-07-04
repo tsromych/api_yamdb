@@ -109,6 +109,7 @@ SIMPLE_JWT = {
     'AUTH_HEADER_TYPES': ('Bearer',),
 }
 
+EMAIL_HOST = 'exempl@yamdb.ru'
 
 # Internationalization
 

@@ -12,4 +12,4 @@ def check_username(username):
         raise serializers.ValidationError(
             'В username использованы недопустимые символы!'
         )
-    return True
+    return username

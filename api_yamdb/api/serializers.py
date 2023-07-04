@@ -151,4 +151,4 @@ class CommentSerializer(serializers.ModelSerializer):
             'pub_date'
         )
         model = Comment
-        ead_only_fields = ('review', 'author',)
+        read_only_fields = ('author',)

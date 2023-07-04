@@ -5,11 +5,12 @@ from django.db import models
 
 from api.service_functions import check_username
 
-
+CHAR_COUNT_254 = 254
+CHAR_COUNT_150 = 150
+CHAR_COUNT_36 = 36
 ROLE_ADMIN = 'admin'
 ROLE_MODERATOR = 'moderator'
 ROLE_USER = 'user'
-ROLE_SUPERUSER = 'superuser'
 
 
 class CustomUser(AbstractUser):
@@ -18,37 +19,43 @@ class CustomUser(AbstractUser):
         (ROLE_USER, 'User'),
         (ROLE_ADMIN, 'Admin'),
         (ROLE_MODERATOR, 'Moderator'),
-        (ROLE_SUPERUSER, 'Superuser'),
     ]
 
-    email = models.EmailField(
-        max_length=254,
+    username = models.CharField(
+        max_length=CHAR_COUNT_150,
+        validators=(check_username,),
         blank=False,
         unique=True,
+        db_index=True,
+        verbose_name='Имя пользователя',
+    )
+    email = models.EmailField(
+        max_length=CHAR_COUNT_254,
+        blank=False,
+        unique=True,
+        verbose_name='Почта',
     )
     role = models.CharField(
-        max_length=150,
+        max_length=CHAR_COUNT_150,
         choices=ROLE_CHOICES,
-        default='user',
+        default=ROLE_USER,
+        verbose_name='Роль',
     )
     confirmation_code = models.CharField(
-        max_length=36,
+        max_length=CHAR_COUNT_36,
         blank=True,
         unique=True,
         default=uuid.uuid4
     )
     bio = models.TextField(
-        'Биография',
         blank=True,
+        verbose_name='Биография',
     )
 
     class Meta:
         ordering = ('-date_joined',)
-
-    def __call__(self, username):
-        checking_result = check_username(username)
-        if checking_result is True:
-            return username
+        verbose_name = 'Пользователь'
+        verbose_name_plural = 'Пользователи'
 
     def __str__(self):
         return self.username

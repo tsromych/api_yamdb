@@ -1,10 +1,12 @@
 from rest_framework import serializers
 
-from users.models import CustomUser
-
 from api.service_functions import check_username
+from .models import CustomUser
 
 User = CustomUser
+
+CHAR_COUNT_254 = 254
+CHAR_COUNT_150 = 150
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -12,10 +14,10 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = (
-            'first_name',
-            'last_name',
             'username',
             'email',
+            'first_name',
+            'last_name',
             'bio',
             'role',
         )
@@ -55,11 +57,11 @@ class ConformationCodeSerializer(serializers.ModelSerializer):
 class UserCreateSerializer(serializers.Serializer):
     username = serializers.CharField(
         required=True,
-        max_length=150
+        max_length=CHAR_COUNT_150,
     )
     email = serializers.EmailField(
         required=True,
-        max_length=254,
+        max_length=CHAR_COUNT_254,
     )
 
     def create(self, validated_data):
@@ -79,6 +81,4 @@ class UserCreateSerializer(serializers.Serializer):
         return data
 
     def validate_username(self, name):
-        checking_result = check_username(name)
-        if checking_result is True:
-            return name
+        return check_username(name)
