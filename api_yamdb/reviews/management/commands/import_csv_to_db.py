@@ -22,6 +22,10 @@ file_name = {
 class Command(BaseCommand):
     """Загрузка данных из CSV файлов в базу данных."""
     def handle(self, *args, **options):
+        def print_import_status(file_name):
+            print(self.style.SUCCESS('Импорт данных из файла '
+                                     f'{file_name} завершен!'))
+            
         print(self.style.SUCCESS('Начинем загрузку данных из CSV файлов...'))
         with open(
             parent_dir + file_name['users'], mode='r', encoding='utf-8'
@@ -37,8 +41,7 @@ class Command(BaseCommand):
                     first_name=['first_name'],
                     last_name=['last_name'],
                 )
-            print(self.style.SUCCESS('Импорт данных из файла '
-                                     f'{file_name["users"]} завершен!'))
+            print_import_status(file_name['users'])
 
         with open(
             parent_dir + file_name['category'], mode='r', encoding='utf-8'
@@ -50,8 +53,7 @@ class Command(BaseCommand):
                     name=row['name'],
                     slug=row['slug'],
                 )
-            print(self.style.SUCCESS('Импорт данных из файла '
-                                     f'{file_name["category"]} завершен!'))
+            print_import_status(file_name['category'])
 
         with open(
             parent_dir + file_name['genre'], mode='r', encoding='utf-8'
@@ -63,8 +65,7 @@ class Command(BaseCommand):
                     name=row['name'],
                     slug=row['slug'],
                 )
-            print(self.style.SUCCESS('Импорт данных из файла '
-                                     f'{file_name["genre"]} завершен!'))
+            print_import_status(file_name['genre'])
 
         with open(
             parent_dir + file_name['titles'], mode='r', encoding='utf-8'
@@ -77,8 +78,7 @@ class Command(BaseCommand):
                     year=int(row['year']),
                     category_id=int(row['category']),
                 )
-            print(self.style.SUCCESS('Импорт данных из файла '
-                                     f'{file_name["titles"]} завершен!'))
+            print_import_status(file_name['titles'])
 
         with open(
             parent_dir + file_name['genre_title'], mode='r', encoding='utf-8'
@@ -90,8 +90,7 @@ class Command(BaseCommand):
                     title_id=int(row['title_id']),
                     genre_id=int(row['genre_id']),
                 )
-            print(self.style.SUCCESS('Импорт данных из файла '
-                                     f'{file_name["genre_title"]} завершен!'))
+            print_import_status(file_name['genre_title'])
 
         with open(
             parent_dir + file_name['review'], mode='r', encoding='utf-8'
@@ -106,8 +105,7 @@ class Command(BaseCommand):
                     score=int(row['score']),
                     pub_date=row['pub_date'],
                 )
-            print(self.style.SUCCESS('Импорт данных из файла '
-                                     f'{file_name["review"]} завершен!'))
+            print_import_status(file_name['review'])
 
         with open(
             parent_dir + file_name['comments'], mode='r', encoding='utf-8'
@@ -121,6 +119,6 @@ class Command(BaseCommand):
                     author_id=int(row['author']),
                     review_id=int(row['review_id']),
                 )
-            print(self.style.SUCCESS('Импорт данных из файла '
-                                     f'{file_name["comments"]} завершен!'))
+            print_import_status(file_name['comments'])
+            
         print(self.style.SUCCESS('Загрузка данных завершена'))
