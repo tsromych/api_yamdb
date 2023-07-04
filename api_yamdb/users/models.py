@@ -3,14 +3,22 @@ import uuid
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 
+from api.service_functions import check_username
+
+
+ROLE_ADMIN = 'admin'
+ROLE_MODERATOR = 'moderator'
+ROLE_USER = 'user'
+ROLE_SUPERUSER = 'superuser'
+
 
 class CustomUser(AbstractUser):
     """Кастомная модель пользователя."""
     ROLE_CHOICES = [
-        ('user', 'User'),
-        ('admin', 'Admin'),
-        ('moderator', 'Moderator'),
-        ('superuser', 'Superuser'),
+        (ROLE_USER, 'User'),
+        (ROLE_ADMIN, 'Admin'),
+        (ROLE_MODERATOR, 'Moderator'),
+        (ROLE_SUPERUSER, 'Superuser'),
     ]
 
     email = models.EmailField(
@@ -35,15 +43,20 @@ class CustomUser(AbstractUser):
     )
 
     class Meta:
-        ordering = ['-date_joined']
+        ordering = ('-date_joined',)
+
+    def __call__(self, username):
+        checking_result = check_username(username)
+        if checking_result is True:
+            return username
 
     def __str__(self):
         return self.username
 
     @property
     def is_admin(self):
-        return self.role == 'admin' or self.is_superuser
+        return self.role == ROLE_ADMIN or self.is_superuser
 
     @property
     def is_moderator(self):
-        return self.role == 'moderator' or self.is_admin
+        return self.role == ROLE_MODERATOR or self.is_admin

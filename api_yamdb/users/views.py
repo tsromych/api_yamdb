@@ -14,8 +14,10 @@ from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import AccessToken
 
 from api.permissions import IsAdmin
-from users.serializers import (ConformationCodeSerializer, RoleUserSerializer,
-                               UserCreateSerializer, UserSerializer)
+
+from users.models import CustomUser
+from users.serializers import (UserSerializer, UserCreateSerializer,
+                               ConformationCodeSerializer, RoleUserSerializer)
 
 User = get_user_model()
 
@@ -35,7 +37,7 @@ class UserViewSet(viewsets.ModelViewSet):
         methods=('get', 'patch',),
         detail=False,
         url_path='me',
-        permission_classes=([IsAuthenticated, ]),
+        permission_classes=(IsAuthenticated, ),
         serializer_class=RoleUserSerializer
     )
     def get_me(self, request):
@@ -43,14 +45,11 @@ class UserViewSet(viewsets.ModelViewSet):
         if request.method == 'GET':
             serializer = self.get_serializer(user)
             return Response(serializer.data, status=status.HTTP_200_OK)
-        try:
-            serializer = self.get_serializer(
-                user, data=request.data, partial=True)
-            serializer.is_valid(raise_exception=True)
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        except ValidationError as error:
-            raise error
+        serializer = self.get_serializer(
+            user, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 def get_and_send_confirmation_code(user):
@@ -99,7 +98,12 @@ class ConfirmCodeView(views.APIView):
         serializer = ConformationCodeSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         user = get_object_or_404(User, username=serializer.data['username'])
-        if serializer.data['confirmation_code'] == user.confirmation_code:
+        if serializer.data['confirmation_code'] != user.confirmation_code:
+            return Response(
+                serializer.errors,
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        else:
             token = AccessToken.for_user(user)
             user.is_active = True
             user.save()
@@ -107,7 +111,3 @@ class ConfirmCodeView(views.APIView):
                 {'token': f'{token}'},
                 status=status.HTTP_200_OK
             )
-        return Response(
-            serializer.errors,
-            status=status.HTTP_400_BAD_REQUEST
-        )

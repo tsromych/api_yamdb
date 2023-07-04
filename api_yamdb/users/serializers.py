@@ -1,9 +1,8 @@
-import re
-
 from rest_framework import serializers
-from rest_framework.validators import UniqueValidator
 
 from users.models import CustomUser
+
+from api.service_functions import check_username
 
 User = CustomUser
 
@@ -53,52 +52,33 @@ class ConformationCodeSerializer(serializers.ModelSerializer):
         )
 
 
-class UserCreateSerializer(serializers.ModelSerializer):
+class UserCreateSerializer(serializers.Serializer):
     username = serializers.CharField(
-        validators=[UniqueValidator(
-            queryset=User.objects.all())]
+        required=True,
+        max_length=150
     )
     email = serializers.EmailField(
-        validators=[UniqueValidator(
-            queryset=User.objects.all())]
+        required=True,
+        max_length=254,
     )
-
-    class Meta:
-        model = User
-        fields = (
-            'username',
-            'email',
-        )
 
     def create(self, validated_data):
         return User.objects.get_or_create(**validated_data)
 
-    def validate_email(self, email):
-        if User.objects.filter(email=email):
+    def validate(self, data):
+        if (User.objects.filter(username=data['username'])
+                and not User.objects.filter(email=data['email'])):
+            raise serializers.ValidationError(
+                'Пользователь с таким username уже существует'
+            )
+        if (User.objects.filter(email=data['email'])
+                and not User.objects.filter(username=data['username'])):
             raise serializers.ValidationError(
                 'Пользователь с таким email уже существует'
             )
-        if len(email) > 254:
-            raise serializers.ValidationError(
-                'Превышена допустимая длина email адреса'
-            )
-        return email
+        return data
 
     def validate_username(self, name):
-        if User.objects.filter(username=name):
-            raise serializers.ValidationError(
-                'Пользователь с таким именем уже существует'
-            )
-        if name == 'me':
-            raise serializers.ValidationError(
-                'Введенное имя недопустимо'
-            )
-        if len(name) > 150:
-            raise serializers.ValidationError(
-                'Превышена допустимая длина имени пользователя'
-            )
-        if not re.match(r'[\w.@+-]+\Z', name):
-            raise serializers.ValidationError(
-                'В username использованы недопустимые символы'
-            )
-        return name
+        checking_result = check_username(name)
+        if checking_result is True:
+            return name
