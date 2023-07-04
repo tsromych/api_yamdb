@@ -4,8 +4,7 @@ from users.models import CustomUser
 
 from api.service_functions import check_username
 
-
-User = CustomUser  # get_user_model()
+User = CustomUser
 
 
 class UserSerializer(serializers.ModelSerializer):
