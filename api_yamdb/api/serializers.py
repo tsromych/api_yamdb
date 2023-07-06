@@ -82,12 +82,15 @@ class PostTitleSerializer(serializers.ModelSerializer):
             'category',
         )
 
-    def create(self, validated_data):
-        genre = validated_data.pop('genre')
+    def validate_genre(self, genre):
         if genre == []:
             raise serializers.ValidationError(
                 'Поле со списком жанров не может быть пустым'
             )
+        return genre
+
+    def create(self, validated_data):
+        genre = validated_data.pop('genre')
         title = Title.objects.create(**validated_data)
         for item in genre:
             TitleGenre.objects.get_or_create(genre=item, title=title)
