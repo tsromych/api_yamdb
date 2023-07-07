@@ -5,8 +5,8 @@ from .models import CustomUser
 
 User = CustomUser
 
-CHAR_COUNT_254 = 254
-CHAR_COUNT_150 = 150
+USERNAME_FIELD_LENGTH = 150
+EMAIL_FIELD_LENGTH = 254
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -57,11 +57,11 @@ class ConformationCodeSerializer(serializers.ModelSerializer):
 class UserCreateSerializer(serializers.Serializer):
     username = serializers.CharField(
         required=True,
-        max_length=CHAR_COUNT_150,
+        max_length=USERNAME_FIELD_LENGTH,
     )
     email = serializers.EmailField(
         required=True,
-        max_length=CHAR_COUNT_254,
+        max_length=EMAIL_FIELD_LENGTH,
     )
 
     def create(self, validated_data):

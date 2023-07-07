@@ -75,8 +75,8 @@ class CommentViewSet(viewsets.ModelViewSet):
     def get_review(self):
         return get_object_or_404(
             Review,
-            id=self.kwargs.get('review_id'),
-            title=self.kwargs['title_id']
+            id=self.kwargs['review_id'],
+            title__id=self.kwargs['title_id']
         )
 
     def get_queryset(self):

@@ -84,7 +84,7 @@ python3 manage.py runserver
 
 ## Загрузка тестовых данных
 
-В проекте API YaMDb в директории /api_yamdb/static/data подготовлены csv-файлы с тестовым контентом для ресурсов Users, Titles, Categories, Genres, Review и Comments. Для загрузки данных выполните в терминале management-команду:
+В проекте API YaMDb в директории `/api_yamdb/static/data` подготовлены csv-файлы с тестовым контентом для ресурсов Users, Titles, Categories, Genres, Review и Comments. Для загрузки данных выполните в терминале management-команду:
 
 ```bash
 # Для Windows

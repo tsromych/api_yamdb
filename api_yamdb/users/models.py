@@ -5,9 +5,10 @@ from django.db import models
 
 from api.service_functions import check_username
 
-CHAR_COUNT_254 = 254
-CHAR_COUNT_150 = 150
-CHAR_COUNT_36 = 36
+USERNAME_FIELD_LENGTH = 150
+EMAIL_FIELD_LENGTH = 254
+ROLE_FIELD_LENGTH = 150
+CONFIRM_FIELD_LENGTH = 36
 ROLE_ADMIN = 'admin'
 ROLE_MODERATOR = 'moderator'
 ROLE_USER = 'user'
@@ -22,7 +23,7 @@ class CustomUser(AbstractUser):
     ]
 
     username = models.CharField(
-        max_length=CHAR_COUNT_150,
+        max_length=USERNAME_FIELD_LENGTH,
         validators=(check_username,),
         blank=False,
         unique=True,
@@ -30,19 +31,19 @@ class CustomUser(AbstractUser):
         verbose_name='Имя пользователя',
     )
     email = models.EmailField(
-        max_length=CHAR_COUNT_254,
+        max_length=EMAIL_FIELD_LENGTH,
         blank=False,
         unique=True,
         verbose_name='Почта',
     )
     role = models.CharField(
-        max_length=CHAR_COUNT_150,
+        max_length=ROLE_FIELD_LENGTH,
         choices=ROLE_CHOICES,
         default=ROLE_USER,
         verbose_name='Роль',
     )
     confirmation_code = models.CharField(
-        max_length=CHAR_COUNT_36,
+        max_length=CONFIRM_FIELD_LENGTH,
         blank=True,
         unique=True,
         default=uuid.uuid4

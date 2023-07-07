@@ -6,18 +6,18 @@ from .validators import validator_year
 
 User = get_user_model()
 
-CHAR_COUNT_256 = 256
-CHAR_COUNT_50 = 50
-CHAR_COUNT_200 = 200
+NAME_FIELD_LENGTH = 256
+SLUG_FIELD_LENGTH = 50
+TEXT_FIELD_LENGTH = 200
 
 
 class AbstractClass(models.Model):
     name = models.CharField(
-        max_length=CHAR_COUNT_256,
+        max_length=NAME_FIELD_LENGTH,
         verbose_name='Название',
     )
     slug = models.SlugField(
-        max_length=CHAR_COUNT_50,
+        max_length=SLUG_FIELD_LENGTH,
         unique=True,
         verbose_name='Слаг',
     )
@@ -49,7 +49,7 @@ class Genre(AbstractClass):
 class Title(models.Model):
     """Модель произведений."""
     name = models.CharField(
-        max_length=CHAR_COUNT_256,
+        max_length=NAME_FIELD_LENGTH,
         db_index=True,
         verbose_name='Название',
     )
@@ -109,7 +109,7 @@ class Review(models.Model):
         verbose_name='Произведение',
     )
     text = models.CharField(
-        max_length=CHAR_COUNT_200
+        max_length=TEXT_FIELD_LENGTH
     )
     author = models.ForeignKey(
         User,
@@ -156,7 +156,7 @@ class Comment(models.Model):
     )
     text = models.CharField(
         verbose_name='Текст комментария',
-        max_length=CHAR_COUNT_200,
+        max_length=TEXT_FIELD_LENGTH,
     )
     author = models.ForeignKey(
         User,
